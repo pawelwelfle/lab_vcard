@@ -17,14 +17,19 @@ public class VCardController {
     @ResponseBody
     public String getVCardURL(@RequestParam("name") String name, @RequestParam("location") String location) {
         String panoramaURL = "https://panoramafirm.pl/szukaj?k=" + name + "&l=" + location;
+
+        return panoramaURL;
+    }
+
+    private VCard createVCard() {
         VCard vcard = new VCard();
         StructuredName n = new StructuredName();
         n.setFamily(name);
-        n.setGiven("Firma:");
+        n.setGroup(location);
         vcard.setStructuredName(n);
-
         String str = Ezvcard.write(vcard).version(VCardVersion.V4_0).go();
-        System.out.println(str);
-        return str;
+        return vcard;
     }
+
+
 }
