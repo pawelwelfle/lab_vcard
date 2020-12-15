@@ -6,7 +6,6 @@ import ezvcard.VCardVersion;
 import ezvcard.property.StructuredName;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,9 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class VCardController {
@@ -56,6 +56,10 @@ public class VCardController {
         return document;
     }
 
-    private static List<Company> getCompanyInfo(String url){
+    private static List<Company> getCompanyInfo(String url) throws IOException {
+        List<Company> companyInfoList = new ArrayList<>();
+        Document document = getDocument(url);
+        // Elements .....
+        return companyInfoList;
     }
 }
