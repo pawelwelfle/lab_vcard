@@ -6,6 +6,7 @@ import ezvcard.VCardVersion;
 import ezvcard.property.StructuredName;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,6 +27,8 @@ public class VCardController {
     @ResponseBody
     public String getVCardURL(@RequestParam("name") String name, @RequestParam("location") String location) throws IOException {
         String panoramaURL = "https://panoramafirm.pl/szukaj?k=" + name + "&l=" + location;
+        List<Company> companyInfo = getCompanyInfo(panoramaURL);
+        createVCard(companyInfo);
 
 
         return panoramaURL;
@@ -34,8 +37,8 @@ public class VCardController {
     private VCard createVCard() {
         VCard vcard = new VCard();
         StructuredName n = new StructuredName();
-        n.setFamily(name);
-        n.setGroup(location);
+//        n.setFamily(name);
+//        n.setGroup(location);
         vcard.setStructuredName(n);
         String str = Ezvcard.write(vcard).version(VCardVersion.V4_0).go();
         return vcard;
@@ -59,7 +62,21 @@ public class VCardController {
     private static List<Company> getCompanyInfo(String url) throws IOException {
         List<Company> companyInfoList = new ArrayList<>();
         Document document = getDocument(url);
-        // Elements .....
+
+        Elements element = document.select("li");
+        Elements name = element.select("h2");
+        Elements location = element.select("div.address");
+        Elements contact = element.select("div.item");
+        Elements email = contact.select("a.ajax-modal-link");
+        Elements phoneNumber = contact.select("a.icon-telephone");
+
+        for (int i = 0; i < name.size(); i++) {
+            companyInfoList.add(new Company(
+                    name.get(i).text(),
+                    location.get(i).text(),
+                    email.get(i).attr("data-company-email"),
+                    phoneNumber.get(i).attr("title")));
+        }
         return companyInfoList;
     }
 }
