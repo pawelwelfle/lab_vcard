@@ -3,7 +3,9 @@ package ppkwu.vcard.lab;
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
+import ezvcard.parameter.TelephoneType;
 import ezvcard.property.StructuredName;
+import ezvcard.property.Telephone;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -34,11 +36,15 @@ public class VCardController {
         return panoramaURL;
     }
 
-    private VCard createVCard() {
+    private VCard createVCard(List<Company> companyInfo) {
+        Company firstCompany = companyInfo.get(0);
+
         VCard vcard = new VCard();
         StructuredName n = new StructuredName();
-//        n.setFamily(name);
-//        n.setGroup(location);
+        n.setFamily(firstCompany.name);
+        n.setGroup(firstCompany.location);
+        vcard.addTelephoneNumber(firstCompany.phoneNumber);
+        vcard.addEmail(firstCompany.email);
         vcard.setStructuredName(n);
         String str = Ezvcard.write(vcard).version(VCardVersion.V4_0).go();
         return vcard;
