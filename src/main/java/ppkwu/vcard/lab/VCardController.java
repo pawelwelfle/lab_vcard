@@ -54,5 +54,8 @@ public class VCardController {
         String lines = s.toString();
         Document document = Jsoup.parse(lines);
         return document;
-
     }
+
+    private static List<Company> getCompanyInfo(String url){
+    }
+}
