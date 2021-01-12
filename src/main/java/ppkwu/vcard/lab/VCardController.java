@@ -31,12 +31,12 @@ public class VCardController {
 
     @GetMapping("/vcard")
     @ResponseBody
-    public ResponseEntity getVCardURL(@RequestParam("name") String name, @RequestParam("location") String location) throws IOException {
+    public ResponseEntity getVCard(@RequestParam("name") String name, @RequestParam("location") String location) throws IOException {
         String panoramaURL = "https://panoramafirm.pl/szukaj?k=" + name + "&l=" + location;
         List<Company> companyInfo = getCompanyInfo(panoramaURL);
 
         String vcardInfo = createVCardString(companyInfo);
-        String filename = "vcard1.vcf";
+        String filename = "vcard.vcf";
         File file = new File(filename);
         FileOutputStream outputStream = new FileOutputStream(file);
         if (file.exists()) {
@@ -52,22 +52,29 @@ public class VCardController {
                 .header("Content-Disposition", "attachment; filename=" + resource.getFilename()).body(resource);
     }
 
-//    private VCard createVCard(List<Company> companyInfo) {
-//        Company firstCompany = companyInfo.get(0);
-//        VCard vcard = new VCard(VCardVersion.V4_0);
-//        StructuredName n = new StructuredName();
-//        n.getParameters().setEncoding(Encoding.QUOTED_PRINTABLE);
-//        n.getParameters().setCharset("utf-8");
-//        n.setLanguage("pl");
-//        n.setFamily(firstCompany.name);
-//        n.setGroup(firstCompany.location);
-//
-//        vcard.setStructuredName(n);
-//        vcard.addTelephoneNumber(firstCompany.phoneNumber);
-//        vcard.addEmail(firstCompany.email);
-//        System.out.println(vcard);
-//        return vcard;
-//    }
+    @GetMapping("/vcardName")
+    @ResponseBody
+    public ResponseEntity getVCardURL(@RequestParam("name") String name) throws IOException {
+        String panoramaURL = "https://panoramafirm.pl/szukaj?k=" + name;
+        List<Company> companyInfo = getCompanyInfo(panoramaURL);
+
+        String vcardInfo = createVCardString(companyInfo);
+        String filename = "vcard.vcf";
+        File file = new File(filename);
+        FileOutputStream outputStream = new FileOutputStream(file);
+        if (file.exists()) {
+            outputStream.write(vcardInfo.getBytes());
+            outputStream.flush();
+            outputStream.close();
+        }
+        Path path = Paths.get(filename);
+        Resource resource = new UrlResource(path.toUri());
+
+        System.out.println(resource);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + resource.getFilename()).body(resource);
+    }
+
 
     private String createVCardString(List<Company> companyInfo) {
         Company firstCompany = companyInfo.get(0);
