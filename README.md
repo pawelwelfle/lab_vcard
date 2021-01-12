@@ -26,7 +26,7 @@ http://localhost:8080/vcard?name=piekarnia&location=lodz+ruda
 http://localhost:8080/vcardName?name=piekarnia
 
 
-###Example of:
+### Example of:
 http://localhost:8080/vcardName?name=piekarnia
 
 BEGIN:VCARD
@@ -37,7 +37,7 @@ ADR;CHARSET=utf-8;TYPE=WORK,PREF:;;05-340 Człekówka 9
 EMAIL:biuro@oskroba.pl
 END:VCARD
 
-###Example of:
+### Example of:
 http://localhost:8080/vcard?name=piekarnia&location=lodz+ruda
 
 BEGIN:VCARD
