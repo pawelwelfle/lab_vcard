@@ -20,7 +20,7 @@ Syntax highlighted code block
 
 <h1>My calendar</h1>
 
-<a href="vcard1.vcf">TEST</a>
+"vcard1.vcf"
 
 - Bulleted
 - List
