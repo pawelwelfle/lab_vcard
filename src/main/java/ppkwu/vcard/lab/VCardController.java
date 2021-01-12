@@ -3,6 +3,7 @@ package ppkwu.vcard.lab;
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
+import ezvcard.parameter.Encoding;
 import ezvcard.parameter.TelephoneType;
 import ezvcard.property.StructuredName;
 import ezvcard.property.Telephone;
@@ -32,21 +33,24 @@ public class VCardController {
         List<Company> companyInfo = getCompanyInfo(panoramaURL);
         createVCard(companyInfo);
 
-
         return panoramaURL;
     }
 
     private VCard createVCard(List<Company> companyInfo) {
         Company firstCompany = companyInfo.get(0);
-
-        VCard vcard = new VCard();
+        VCard vcard = new VCard(VCardVersion.V4_0);
         StructuredName n = new StructuredName();
+        n.getParameters().setEncoding(Encoding.QUOTED_PRINTABLE);
+        n.getParameters().setCharset("utf-8");
+        n.setLanguage("pl");
         n.setFamily(firstCompany.name);
         n.setGroup(firstCompany.location);
+
+        vcard.setStructuredName(n);
         vcard.addTelephoneNumber(firstCompany.phoneNumber);
         vcard.addEmail(firstCompany.email);
-        vcard.setStructuredName(n);
-        String str = Ezvcard.write(vcard).version(VCardVersion.V4_0).go();
+
+        System.out.println(vcard);
         return vcard;
     }
 
