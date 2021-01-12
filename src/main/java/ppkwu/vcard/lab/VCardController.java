@@ -12,6 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,11 +31,9 @@ public class VCardController {
 
     @GetMapping("/vcard")
     @ResponseBody
-    public String getVCardURL(@RequestParam("name") String name, @RequestParam("location") String location) throws IOException {
+    public ResponseEntity getVCardURL(@RequestParam("name") String name, @RequestParam("location") String location) throws IOException {
         String panoramaURL = "https://panoramafirm.pl/szukaj?k=" + name + "&l=" + location;
         List<Company> companyInfo = getCompanyInfo(panoramaURL);
-//        VCard vcard = createVCard(companyInfo);
-//        System.out.println(vcard);
 
         String vcardInfo = createVCardString(companyInfo);
         String filename = "vcard1.vcf";
@@ -49,8 +48,8 @@ public class VCardController {
         Resource resource = new UrlResource(path.toUri());
 
         System.out.println(resource);
-
-        return panoramaURL;
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + resource.getFilename()).body(resource);
     }
 
 //    private VCard createVCard(List<Company> companyInfo) {
