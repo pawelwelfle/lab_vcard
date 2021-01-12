@@ -10,16 +10,18 @@ import ezvcard.property.Telephone;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,27 +33,53 @@ public class VCardController {
     public String getVCardURL(@RequestParam("name") String name, @RequestParam("location") String location) throws IOException {
         String panoramaURL = "https://panoramafirm.pl/szukaj?k=" + name + "&l=" + location;
         List<Company> companyInfo = getCompanyInfo(panoramaURL);
-        createVCard(companyInfo);
+//        VCard vcard = createVCard(companyInfo);
+//        System.out.println(vcard);
+
+        String vcardInfo = createVCardString(companyInfo);
+        String filename = "vcard1.vcf";
+        File file = new File(filename);
+        FileOutputStream outputStream = new FileOutputStream(file);
+        if (file.exists()) {
+            outputStream.write(vcardInfo.getBytes());
+            outputStream.flush();
+            outputStream.close();
+        }
+        Path path = Paths.get(filename);
+        Resource resource = new UrlResource(path.toUri());
+
+        System.out.println(resource);
 
         return panoramaURL;
     }
 
-    private VCard createVCard(List<Company> companyInfo) {
+//    private VCard createVCard(List<Company> companyInfo) {
+//        Company firstCompany = companyInfo.get(0);
+//        VCard vcard = new VCard(VCardVersion.V4_0);
+//        StructuredName n = new StructuredName();
+//        n.getParameters().setEncoding(Encoding.QUOTED_PRINTABLE);
+//        n.getParameters().setCharset("utf-8");
+//        n.setLanguage("pl");
+//        n.setFamily(firstCompany.name);
+//        n.setGroup(firstCompany.location);
+//
+//        vcard.setStructuredName(n);
+//        vcard.addTelephoneNumber(firstCompany.phoneNumber);
+//        vcard.addEmail(firstCompany.email);
+//        System.out.println(vcard);
+//        return vcard;
+//    }
+
+    private String createVCardString(List<Company> companyInfo) {
         Company firstCompany = companyInfo.get(0);
-        VCard vcard = new VCard(VCardVersion.V4_0);
-        StructuredName n = new StructuredName();
-        n.getParameters().setEncoding(Encoding.QUOTED_PRINTABLE);
-        n.getParameters().setCharset("utf-8");
-        n.setLanguage("pl");
-        n.setFamily(firstCompany.name);
-        n.setGroup(firstCompany.location);
 
-        vcard.setStructuredName(n);
-        vcard.addTelephoneNumber(firstCompany.phoneNumber);
-        vcard.addEmail(firstCompany.email);
-
-        System.out.println(vcard);
-        return vcard;
+        return "BEGIN:VCARD\n" +
+                "VERSION:4.0\n" +
+                "FN;CHARSET=utf-8:" + firstCompany.getName() + "\n" +
+                "TEL;WORK;VOICE:" + firstCompany.getPhoneNumber() + "\n" +
+                "ADR;CHARSET=utf-8;TYPE=WORK,PREF:;;" + firstCompany.getLocation() + "\n" +
+                "EMAIL:" + firstCompany.getEmail() + "\n" +
+                "END:VCARD";
     }
 
     //got from VCalendar
